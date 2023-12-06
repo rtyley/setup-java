@@ -61,7 +61,8 @@ const supportedPackageManager: PackageManager[] = [
       '**/*.sbt',
       '**/project/build.properties',
       '**/project/**.scala',
-      '**/project/**.sbt'
+      '**/project/**.sbt',
+      '!**/version.sbt' // releasing a new version of a library project shouldn't invalidate the entire sbt cache
     ]
   }
 ];
@@ -95,7 +96,7 @@ async function computeCacheKey(
   const pattern = cacheDependencyPath
     ? cacheDependencyPath.trim().split('\n')
     : packageManager.pattern;
-  const fileHash = await glob.hashFiles(pattern.join('\n'));
+  const fileHash = await glob.hashFiles(pattern.join('\n'), undefined, undefined, true);
   if (!fileHash) {
     throw new Error(
       `No file in ${process.cwd()} matched to [${pattern}], make sure you have checked out the target repository`
